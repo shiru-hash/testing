@@ -1,0 +1,11 @@
+ { 
+  "icbCatalogRepository":
+  [
+   { 
+    "providerCode": "ibmcloud",
+    "sourcePath": "/",
+    "serviceOfferings":[
+    ]
+   }
+  ]
+ }
