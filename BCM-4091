@@ -3,8 +3,8 @@ Link to BCM : https://jira.gravitant.net/browse/BCM-4091
 Prerequisites:
 
 Selected user must have a "Catalog Administrator" role.
-Value 'discoverContent' should be enabled i.e. set to 'true' for the azure content server.
-Value 'manageSOEnabled' should be enabled i.e. set to 'true' for the azure content server.
+Value 'discoverContent' should be enabled i.e. set to 'true' for the ibmcloud content server.
+Value 'manageSOEnabled' should be enabled i.e. set to 'true' for the ibmcloud content server.
 Enabling Feature Flag
 POST {{host}}/core/featureflagmanagement/v1/featureflag
  
@@ -16,15 +16,15 @@ BODY:
   "configurationvalue": "true"
 }
 Enabling discovery and manageSOEdit
-PUT {{host}}/catalog/v3/providers/azure
+PUT {{host}}/catalog/v3/providers/ibmcloud
  
 Headers: username, apikey
  
 BODY:
   
 {
-  "provider": "Azure",
-  "adapter": "http://cb-azure-catalog-int:3003/catalog/content",
+  "provider": "ibmcloud",
+  "adapter": "http://cb-sl-catalog-int:3003/catalog/content",
   "discoverContent": true,
   "manageSOEnabled": true
 }
@@ -34,8 +34,8 @@ icb_catalog_metadata.json
 {
     "icbCatalogRepository": [
         {
-            "providerName": "Azure",
-            "providerCode": "azure",
+            "providerName": "ibmcloud",
+            "providerCode": "ibmcloud",
             "discoverContent": true,
             "enableVersion": true,
             "sourcePath": "/source",
@@ -45,7 +45,7 @@ icb_catalog_metadata.json
 }
 source (folder mentioned in sourcePath above) → (type: folder)
 
-i) 101-simple-vm (containing ARM template inside) OR Native template (source containing ARM Template) (Folders containing azure ARM templates)
+i) 101-simple-vm (containing terraform template inside) OR Native template (source containing terraform Template) (Folders containing ibmcloud templates)
 
 IMPORT USING GitHub:
 The MCMP platform should support Importing templates from the link configured with the provider account.
@@ -60,7 +60,7 @@ Headers: username, apikey
         "providers_adapters": [{
                 "provider": "GITHUB",
                 "providerCode": "github",
-                "adapter": "http://cb-azure-catalog-int:3003/catalog/content",
+                "adapter": "http://cb-sl-catalog-int:3003/catalog/content",
                 "discoverContent": true,
                 "providerOfferingTypes": [
                         "iaas"
