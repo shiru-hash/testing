@@ -1,1 +1,193 @@
+Repository created for Testing purpose of BCM-4091
+Link to BCM : https://jira.gravitant.net/browse/BCM-4091
+Prerequisites:
 
+Selected user must have a "Catalog Administrator" role.
+Value 'discoverContent' should be enabled i.e. set to 'true' for the azure content server.
+Value 'manageSOEnabled' should be enabled i.e. set to 'true' for the azure content server.
+Enabling Feature Flag
+POST {{host}}/core/featureflagmanagement/v1/featureflag
+ 
+Headers: username, apikey, content-type, accept
+ 
+BODY:
+{
+  "configurationkey": "em_bcm_683_beta",
+  "configurationvalue": "true"
+}
+Enabling discovery and manageSOEdit
+PUT {{host}}/catalog/v3/providers/azure
+ 
+Headers: username, apikey
+ 
+BODY:
+  
+{
+  "provider": "Azure",
+  "adapter": "http://cb-azure-catalog-int:3003/catalog/content",
+  "discoverContent": true,
+  "manageSOEnabled": true
+}
+Basic File Structure:
+
+icb_catalog_metadata.json
+{
+    "icbCatalogRepository": [
+        {
+            "providerName": "Azure",
+            "providerCode": "azure",
+            "discoverContent": true,
+            "enableVersion": true,
+            "sourcePath": "/source",
+            "serviceOfferings": []
+        }
+    ]
+}
+source (folder mentioned in sourcePath above) → (type: folder)
+
+i) 101-simple-vm (containing ARM template inside) OR Native template (source containing ARM Template) (Folders containing azure ARM templates)
+
+IMPORT USING GitHub:
+The MCMP platform should support Importing templates from the link configured with the provider account.
+
+Steps to create provider adapter map:
+
+POST https://<HOST>/catalog/v3/providers_adapters
+
+Headers: username, apikey
+
+{
+        "providers_adapters": [{
+                "provider": "GITHUB",
+                "providerCode": "github",
+                "adapter": "http://cb-azure-catalog-int:3003/catalog/content",
+                "discoverContent": true,
+                "providerOfferingTypes": [
+                        "iaas"
+                ],
+                "manageSOEnabled": true,
+                "enableVersion": false
+        }]
+}
+Steps to create a service provider with GitHub account:
+
+POST https://<host>/cb-credential-service/api/v2.0/metadata/serviceProviders
+
+Headers: username, apikey, accept, content-type
+
+{
+"providerType": "github",
+"displayName": "Github",
+"iconImage": "path of icon for this provider",
+"canSupportSubAccounts": false,
+"canDiscoverSubAccounts": false,
+"canDetachSubAccounts": false,
+"canDoTestConnection": true,
+"version": 1,
+"accountMetadata": {
+"accountNumber": {
+"type": "string",
+"minLength": 12,
+"maxLength": 50,
+"canUpdate": true,
+"isRequired": true,
+"regex": "",
+"displayLabel": "Account Number",
+"helpText": "Add Account Number",
+"translationCodes": {
+"displayLabel": "CO_ACCOUNT_NUMBER",
+"helpText": "CO_ACCOUNT_NUMBER"
+},
+"appliesTo": [
+{
+"accountType": "asset",
+"isRequired": true
+}
+],
+"displayOrder": 1
+},
+"baseUrl": {
+"type": "string",
+"minLength": 10,
+"maxLength": 500,
+"canUpdate": true,
+"isRequired": true,
+"regex": "",
+"displayLabel": "Endpoint Url",
+"helpText": "Add Endpoint Url",
+"translationCodes": {
+"displayLabel": "CO_ENDPOINT_URL",
+"helpText": "CO_ADD_ENDPOINT_URL"
+},
+"appliesTo": [
+{
+"accountType": "asset",
+"isRequired": true
+}
+],
+"displayOrder": 2
+}
+},
+"credentialMetadata": {
+"catalogIngestion": {
+"token": {
+"type": "string",
+"canUpdate": true,
+"minLength": 12,
+"maxLength": 200,
+"isRequired": true,
+"displayLabel": "Token",
+"helpText": "Add GHE Read only token",
+"translationCodes": {
+"displayLabel": "CO_TOKEN_SET",
+"helpText": "CO_ENTER_TOKEN_SET"
+},
+"displayOrder": 3
+}
+}
+},
+"credentialAdvancedMetadata": {
+"project": {
+"type": "string",
+"canUpdate": true,
+"minLength": 2,
+"maxLength": 100,
+"isRequired": true,
+"displayLabel": "Project",
+"helpText": "Enter Project Name",
+"translationCodes": {
+"displayLabel": "CO_PROJECT_KEY",
+"helpText": "CO_ENTER_PROJECT_KEY"
+},
+"displayOrder": 4
+},
+"branch": {
+"type": "string",
+"canUpdate": true,
+"minLength": 1,
+"maxLength": 100,
+"isRequired": true,
+"displayLabel": "Branch name",
+"helpText": "Add Branch name",
+"translationCodes": {
+"displayLabel": "CO_BRANCH_KEY",
+"helpText": "CO_ENTER_BRANCH_KEY"
+},
+"displayOrder": 5
+}
+}
+}
+To get Vauld ID from Response:
+
+GET https://<host>/cb-credential-service/api/v2.0/vault/configuration
+
+Headers: username, apikey, Content-Type, Accept
+Create a service Provider using Vault ID:
+
+POST “https://<host>/cb-credential-service/api/v2.0/serviceProviders
+{
+  "vaultAdaptorId": <vaultid>, --this is vault_id from above response
+  "serviceProviderName": "Github",
+  "serviceProviderType": "github",
+  "serviceProviderCode": "github"
+}
